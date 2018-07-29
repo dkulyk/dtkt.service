@@ -1,5 +1,3 @@
-import {config} from 'dotenv';
-config();
 import * as express from "express";
 import {Response, Request, NextFunction} from "express";
 import * as cookieParser from 'cookie-parser';

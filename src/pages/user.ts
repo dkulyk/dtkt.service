@@ -1,20 +1,38 @@
-import {app} from "../app";
 import {Express, Request, Response} from "express";
 import {cookie, Session} from "../session";
 import {Ability} from "../entity/Shop/Ability";
 import {Mailing} from "../entity/Mailing";
+import {Item} from "../entity/Shop/Item";
 
 const handler = async (req: Request, res: Response) => {
     let session: Session = req['session'],
         ping = session.getCache('ping');
     if (!ping) {
         try {
-            let user = await session.user(), abilities = [], mailings = [], phone;
+            let user = await session.user(), abilities = [], mailings = [], phone, leftSubscribe = null;
             if (user) {
                 abilities = (await user.getActiveAbilities()).map((ability: Ability) => ability.type.name);
                 phone = await user.getPhone();
                 mailings = user.mailings.map((m: Mailing) => m.id);
+
+                let item = await Item.createQueryBuilder('item')
+                    .innerJoin('item.user', 'user')
+                    .where({
+                        'periodical': 1,
+                        'active': 1
+                    })
+                    .andWhere('user.id = :user', {user: user.id})
+                    .addOrderBy('end', 'DESC')
+                    .getOne();
+
+                if (item) {
+                    let date: Date = new Date();
+                    date.setHours(0, 0, 0);
+                    let dateSubscribe = new Date(Math.floor(item.end / 12), item.end % 12 + 1, 0, 0, 0, 0);
+                    leftSubscribe = Math.floor((dateSubscribe.getTime() - date.getTime()) /  86400000) + 1;
+                }
             }
+
             ping = {
                 id: user ? user.id : 0,
                 email: user ? user.email : '',
@@ -23,7 +41,8 @@ const handler = async (req: Request, res: Response) => {
                 mailings,
                 sname: cookie,
                 sid: session.getId(),
-                phone: phone ? phone.phone : ''
+                phone: phone ? phone.phone : '',
+                leftSubscribe
             };
 
             session.setCache('ping', ping, 300);

@@ -1,21 +1,19 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "../User";
-import {Type} from "./Ability/Type";
-import {Item} from "./Item";
+import {Ability} from "./Ability";
 
-@Entity('shop_abilities')
-export class Ability {
+@Entity('shop_subscribe')
+export class Item extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
-
     @Column({type: 'tinyint', width: 1, unsigned: true, default: 0})
     active: number;
 
-    @Column({type: 'int', unsigned: true, default: 0})
-    count: number;
+    @Column({type: 'tinyint', width: 1, unsigned: true, default: 0})
+    periodical: number;
 
     @Column({type: 'int', unsigned: true, default: 0})
-    total: number;
+    count: number;
 
     @Column({type: 'int', unsigned: true, nullable: true, default: null})
     begin: number | null;
@@ -30,20 +28,9 @@ export class Ability {
     @JoinColumn({name: "user_id"})
     user: User;
 
+    @OneToMany(type => Ability, (ab: Ability) => ab.item)
+    abilities: Ability[];
+
     @Column({type: 'int', unsigned: true})
     user_id: number;
-
-    @ManyToOne(type => Type, (type: Type) => type.abilities, {eager: true})
-    @JoinColumn({name: "type_id"})
-    type: Type;
-
-    @Column({type: 'int', unsigned: true})
-    type_id: number;
-
-
-    @ManyToOne(type => Item, (item: Item) => item.abilities)
-    @JoinColumn({name: "item_id"})
-    item: Item;
-
-
 }
