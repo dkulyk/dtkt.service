@@ -73,10 +73,10 @@ const handler = async (req: Request, res: Response) => {
         }
     }
     if (req.query.callback) {
-        res.setHeader('Content-Type', 'application/x-javascript');
+        res.setHeader('Content-Type', 'application/x-javascript; charset=utf-8');
         res.end(`${req.query.callback}(${JSON.stringify(ping)});`);
     } else {
-        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
         res.end(JSON.stringify(ping));
     }
 };
