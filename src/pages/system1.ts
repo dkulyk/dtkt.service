@@ -1,4 +1,4 @@
-import {app, requests} from "../app";
+import {requests} from "../app";
 import {Express, Request, Response} from "express";
 
 const scale = 6;
@@ -11,12 +11,12 @@ let interval = setInterval(function () {
     _req = reqs;
 }, 60 / scale * 1000);
 
-export default function (app:Express) {
+export default function (app: Express) {
     app.on('end', () => {
         clearInterval(interval);
     });
 
-    app.get('/terminate', function (req: Request, res: Response) {
+    app.get('/terminate', (req: Request, res: Response) => {
         res.end('pending...');
         process.nextTick(() => {
             process.exit();

@@ -3,17 +3,36 @@ import {cookie, Session} from "../session";
 import {Ability} from "../entity/Shop/Ability";
 import {Mailing} from "../entity/Mailing";
 import {Item} from "../entity/Shop/Item";
+import {LessThan, MoreThan, Not} from "typeorm";
 
 const handler = async (req: Request, res: Response) => {
     let session: Session = req['session'],
         ping = session.getCache('ping');
     if (!ping) {
         try {
-            let user = await session.user(), abilities = [], mailings = [], phone, leftSubscribe = null;
+            let user = await session.user(), abilities:{ [key: string]: any } = [], phone, leftSubscribe = null;
             if (user) {
-                abilities = (await user.getActiveAbilities()).map((ability: Ability) => ability.type.name);
+                const date = new Date;
+                const month = date.getFullYear() * 12 + date.getMonth();
+                abilities = (await Ability.createQueryBuilder('ability')
+                    .innerJoin('ability.type', 'type', 'type.name IS NOT NULL')
+                    .addSelect('type')
+                    .addSelect("SUM(ability.count)", 'ability_count')
+                    .where({
+                        user_id: user.id,
+                        active: 1,
+                        begin: Not(MoreThan(month)),
+                        end: Not(LessThan(month))
+                    })
+                    .getMany())
+                    .reduce((result: { [key: string]: any }, ability: Ability) => {
+                        console.log(ability);
+                        result[ability.type.name] = ability.type.options & 1 ? ability.count : true;
+                        return result;
+                    }, {});
+
                 phone = await user.getPhone();
-                mailings = user.mailings.map((m: Mailing) => m.id);
+                abilities.mailings = user.mailings.map((m: Mailing) => m.id);
 
                 let item = await Item.createQueryBuilder('item')
                     .innerJoin('item.user', 'user')
@@ -29,7 +48,7 @@ const handler = async (req: Request, res: Response) => {
                     let date: Date = new Date();
                     date.setHours(0, 0, 0);
                     let dateSubscribe = new Date(Math.floor(item.end / 12), item.end % 12 + 1, 0, 0, 0, 0);
-                    leftSubscribe = Math.floor((dateSubscribe.getTime() - date.getTime()) /  86400000) + 1;
+                    leftSubscribe = Math.floor((dateSubscribe.getTime() - date.getTime()) / 86400000) + 1;
                 }
             }
 
@@ -38,7 +57,6 @@ const handler = async (req: Request, res: Response) => {
                 email: user ? user.email : '',
                 name: user ? user.name : '',
                 abilities,
-                mailings,
                 sname: cookie,
                 sid: session.getId(),
                 phone: phone ? phone.phone : '',

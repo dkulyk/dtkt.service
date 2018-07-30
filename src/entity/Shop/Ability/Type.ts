@@ -5,7 +5,6 @@ import {
     JoinColumn,
     OneToMany,
     PrimaryGeneratedColumn,
-    Timestamp,
     UpdateDateColumn
 } from "typeorm";
 import {Ability} from "../Ability";
@@ -24,13 +23,16 @@ export class Type {
     @Column()
     caption: string;
 
+    @Column({type: 'int', unsigned: true, default: 0})
+    options: number;
+
     @CreateDateColumn({type: 'timestamp'})
     created_at: Date;
 
     @UpdateDateColumn({type: 'timestamp'})
     updated_at: Date;
 
-    @OneToMany(type => Ability, (ability: Ability) => ability.type)
+    @OneToMany(() => Ability, (ability: Ability) => ability.type)
     @JoinColumn({name: "type_id"})
     abilities: Ability[];
 }
