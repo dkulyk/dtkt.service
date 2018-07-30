@@ -18,6 +18,7 @@ const handler = async (req: Request, res: Response) => {
                     .innerJoin('ability.type', 'type', 'type.name IS NOT NULL')
                     .addSelect('type')
                     .addSelect("SUM(ability.count)", 'ability_count')
+                    .groupBy('type_id')
                     .where({
                         user_id: user.id,
                         active: 1,
