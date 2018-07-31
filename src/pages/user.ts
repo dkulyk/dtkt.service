@@ -10,7 +10,7 @@ const handler = async (req: Request, res: Response) => {
         ping = session.getCache('ping');
     if (!ping) {
         try {
-            let user = await session.user(), abilities:{ [key: string]: any } = [], phone, leftSubscribe = null;
+            let user = await session.user(), abilities: { [key: string]: any } = [], phone, leftSubscribe = null;
             if (user) {
                 const date = new Date;
                 const month = date.getFullYear() * 12 + date.getMonth();
@@ -27,7 +27,6 @@ const handler = async (req: Request, res: Response) => {
                     })
                     .getMany())
                     .reduce((result: { [key: string]: any }, ability: Ability) => {
-                        console.log(ability);
                         result[ability.type.name] = ability.type.options & 1 ? ability.count : true;
                         return result;
                     }, {});
@@ -72,6 +71,7 @@ const handler = async (req: Request, res: Response) => {
             return;
         }
     }
+
     if (req.query.callback) {
         res.setHeader('Content-Type', 'application/x-javascript; charset=utf-8');
         res.end(`${req.query.callback}(${JSON.stringify(ping)});`);
@@ -80,9 +80,8 @@ const handler = async (req: Request, res: Response) => {
         res.end(JSON.stringify(ping));
     }
 };
+
 export default function (app: Express) {
     app.get('/auth/ping', handler);
     app.get('/ping', handler);
 }
-
-

@@ -36,6 +36,14 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(sessionMiddleware());
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const origin = req.header('origin');
+    if (origin) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    next();
+});
 user(app);
 news(app);
 
