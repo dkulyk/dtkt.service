@@ -127,5 +127,5 @@ export default function (app: Express) {
         }));
     });
 
-    app.use('/docs', docs);
+    app.use('/documents', docs);
 }
