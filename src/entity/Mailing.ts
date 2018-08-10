@@ -1,14 +1,4 @@
-import {
-    Column, CreateDateColumn,
-    Entity,
-    getRepository,
-    JoinColumn,
-    LessThan, ManyToMany, ManyToOne,
-    MoreThan,
-    Not,
-    OneToMany,
-    PrimaryGeneratedColumn, UpdateDateColumn
-} from "typeorm";
+import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity('mailing')
 export class Mailing {

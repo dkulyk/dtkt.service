@@ -29,6 +29,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 import system from './pages/system1';
 import user from './pages/user';
 import news from './pages/news';
+import docs from './pages/docs';
 import bodyParser = require("body-parser");
 
 system(app);
@@ -46,4 +47,4 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 user(app);
 news(app);
-
+docs(app);
