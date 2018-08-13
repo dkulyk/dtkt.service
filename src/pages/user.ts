@@ -11,7 +11,6 @@ const handler = async (req: Request, res: Response) => {
     if (ping === void 0) {
         try {
             const user = await session.user();
-            ping = null;
             if (user) {
                 const date = new Date;
                 const month = date.getFullYear() * 12 + date.getMonth();
@@ -61,6 +60,17 @@ const handler = async (req: Request, res: Response) => {
                     phone: phone ? phone.phone : '',
                     leftSubscribe
                 };
+            } else {
+                ping = {
+                    id: 0,
+                    email: '',
+                    name: '',
+                    abilities: {},
+                    sname: cookie,
+                    sid: session.getId(),
+                    phone: '',
+                    leftSubscribe: 0
+                }
             }
 
 
