@@ -1,10 +1,11 @@
 import * as express from "express";
 import {Express, Request, Response} from "express";
 import {Session} from "../session";
-import {getConnection, LessThan, MoreThan, Not} from "typeorm";
+import {getConnection, getRepository, LessThan, MoreThan, Not} from "typeorm";
 import {Document} from "../entity/Document";
 import {Stat} from "../entity/Document/Stat";
 import {Ability} from "../entity/Shop/Ability";
+import {Meta} from "../entity/Document/Meta";
 
 export default function (app: Express) {
     const docs = express();
@@ -62,17 +63,19 @@ export default function (app: Express) {
         });
 
     docs.get('/access', async (req: Request, res: Response) => {
-        const document = await Document.createQueryBuilder('document')
-            .where('document.uid = :uid', {uid: req.query.uid})
-            .getOne();
+        const document = await getRepository(Document).findOne({
+            where:{
+                uid:req.query.uid
+            }
+        });
         if (!document) {
             res.end();
             return;
         }
 
         Document.createQueryBuilder('document')
-            .update(Document)
-            .where("id = :id", {id: document.id})
+            .update(Meta)
+            .where("uid = :uid", {uid: document.uid})
             .set({
                 hits: () => "hits + 1"
             })
@@ -86,7 +89,6 @@ export default function (app: Express) {
             const date = new Date;
             let access = 1;
             if (user) {
-
                 const month = date.getFullYear() * 12 + date.getMonth();
                 const ability: Ability = await (await Ability.createQueryBuilder('ability')
                     .innerJoin('ability.type', 'type', 'type.name = :name', {name: 'documents'})
@@ -123,7 +125,7 @@ export default function (app: Express) {
 
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({
-            hits: document.hits + 1
+            hits: document.meta.hits + 1
         }));
     });
 

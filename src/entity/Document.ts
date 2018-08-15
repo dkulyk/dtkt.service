@@ -1,5 +1,6 @@
-import {BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "./User";
+import {Meta} from "./Document/Meta";
 
 @Entity('docs2_docs')
 export class Document extends BaseEntity {
@@ -8,9 +9,6 @@ export class Document extends BaseEntity {
 
     @Column({type: 'varchar', length: 15})
     uid: string;
-
-    @Column({type: 'int', unsigned: true, default: 0})
-    hits: number;
 
     //
     // @Column({type: 'varchar', length: 255})
@@ -32,4 +30,10 @@ export class Document extends BaseEntity {
         inverseJoinColumn: {name: 'client_id'}
     })
     clients: User[];
+
+    @OneToOne(() => Meta, (m: Meta) => m.document, {eager: true})
+    @JoinColumn({
+        name: 'uid', referencedColumnName: 'uid'
+    })
+    meta: Meta;
 }
