@@ -94,5 +94,7 @@ const handler = async (req: Request, res: Response) => {
 
 export default function (app: Express) {
     app.get('/auth/ping', handler);
+    //temporary
+    app.get('/ru/ping', handler);
     app.get('/ping', handler);
 }
