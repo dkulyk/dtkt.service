@@ -64,8 +64,8 @@ export default function (app: Express) {
 
     docs.get('/access', async (req: Request, res: Response) => {
         const document = await getRepository(Document).findOne({
-            where:{
-                uid:req.query.uid
+            where: {
+                uid: req.query.uid
             }
         });
         if (!document) {
@@ -129,5 +129,41 @@ export default function (app: Express) {
         }));
     });
 
+    function inlineDoc(res: Response, document: Document, access: boolean) {
+        res.end(`<input type="hidden" id="doc_access" value="${access ? '1' : '0'}" data-access="${document.meta.access}">`);
+    }
+
+    docs.get('/inline', async (req: Request, res: Response) => {
+        const document = await getRepository(Document).findOne({
+            where:{uid:req.query.uid}
+        });
+        if (!document || document.meta.access === 1) {
+            res.end('');
+            return;
+        }
+        console.log(document);
+        const session: Session = req['session'];
+        const user = await session.user();
+        if (!user) {
+            return inlineDoc(res, document, false);
+        }
+        if (document.meta.access > 2) {
+            const date = new Date;
+            const month = date.getFullYear() * 12 + date.getMonth();
+            const ability: Ability = await (await Ability.createQueryBuilder('ability')
+                .innerJoin('ability.type', 'type', 'type.name = :name', {name: 'documents'})
+                .where({
+                    user_id: user.id,
+                    active: 1,
+                    begin: Not(MoreThan(month)),
+                    end: Not(LessThan(month))
+                })
+                .getOne());
+            if (!ability) {
+                return inlineDoc(res, document, false);
+            }
+        }
+        return inlineDoc(res, document, true);
+    });
     app.use('/documents', docs);
 }
