@@ -141,7 +141,7 @@ export default function (app: Express) {
             res.end('');
             return;
         }
-        console.log(document);
+
         const session: Session = req['session'];
         const user = await session.user();
         if (!user) {

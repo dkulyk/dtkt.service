@@ -1,4 +1,4 @@
-import {requests} from "../app";
+import {log, requests} from "../app";
 import {Express, Request, Response} from "express";
 
 const scale = 6;
@@ -50,6 +50,16 @@ export default function (app: Express) {
         res.write('Uptime: ' + Math.floor(u / 86400) + ':' + new Date(0, 0, 0, 0, 0, process.uptime()).toTimeString() + '\n');
         res.write('Requests: ' + requests() + '     ' + rps.join(' / ') + ' rps\n');
         //res.write(requests.join(' '));
+        res.write('\n\n');
+        let _logs = log().reduce((log, one) => {
+            for (let k in one) {
+                log[k] = (log[k] || 0) + one[k];
+            }
+            return log;
+        }, {});
+        for (let k in _logs) {
+            res.write(`${_logs[k]}\t${k}\n`);
+        }
         res.end();
     });
 }

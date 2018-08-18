@@ -16,9 +16,25 @@ export function active(): number {
     return _active;
 }
 
+let logs: { [key: string]: number }[] = [], currentLog: { [key: string]: number } = {};
+
+const logInterval = setInterval(() => {
+    logs.unshift(currentLog);
+    currentLog = {};
+    logs.length = 6;
+}, 10000);
+app.on('end', () => {
+    clearInterval(logInterval);
+});
+
+export function log(): { [key: string]: number }[] {
+    return logs;
+}
+
 app.use((req: Request, res: Response, next: NextFunction) => {
     ++_requests;
     ++_active;
+    currentLog[req.path] = (currentLog[req.path] || 0) + 1;
     res.on('end', () => {
         --_active;
     });
