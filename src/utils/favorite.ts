@@ -46,7 +46,7 @@ export default function (route: IRoute, section: string) {
             return;
         }
         const rel = User.createQueryBuilder('user')
-            .relation(User, 'content')
+            .relation(Content, 'users')
             .of(content.id);
 
         await rel.remove(user.id);
