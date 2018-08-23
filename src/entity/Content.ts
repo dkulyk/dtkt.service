@@ -1,15 +1,4 @@
-import {
-    BaseEntity,
-    Column, CreateDateColumn,
-    Entity,
-    getRepository,
-    JoinColumn, JoinTable,
-    LessThan, ManyToMany, ManyToOne,
-    MoreThan,
-    Not,
-    OneToMany,
-    PrimaryGeneratedColumn, UpdateDateColumn
-} from "typeorm";
+import {BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from "typeorm";
 import {User} from "./User";
 
 @Entity('content')
@@ -19,6 +8,9 @@ export class Content extends BaseEntity {
 
     @Column({type: 'char', length: 8})
     section: string;
+
+    @Column({type: 'int', unsigned: true})
+    hits: number = 0;
     //
     // @Column({type: 'varchar', length: 255})
     // title_uk: string;
