@@ -3,7 +3,7 @@ import {config} from 'dotenv';
 
 config();
 import {app} from "./app";
-import './dksession';
+//import './dksession';
 import {createConnection} from "typeorm";
 
 createConnection().then(() => {

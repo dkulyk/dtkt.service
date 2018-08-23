@@ -47,11 +47,11 @@ export default function (route: IRoute, section: string) {
         }
         const rel = User.createQueryBuilder('user')
             .relation(User, 'content')
-            .of(user.id);
+            .of(content.id);
 
-        await rel.remove(content.id);
+        await rel.remove(user.id);
         if (favorite) {
-            await rel.add(content.id);
+            await rel.add(user.id);
         }
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(favorite));
