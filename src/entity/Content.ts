@@ -1,5 +1,15 @@
-import {BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from "typeorm";
+import {
+    BaseEntity,
+    Column,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn
+} from "typeorm";
 import {User} from "./User";
+import {Access} from "./Content/Access";
 
 @Entity('content')
 export class Content extends BaseEntity {
@@ -27,4 +37,8 @@ export class Content extends BaseEntity {
     @ManyToMany(() => User, (u: User) => u.content)
     @JoinTable({name: 'users_content', joinColumn: {name: 'content_id'}, inverseJoinColumn: {name: 'user_id'}})
     users: User[];
+
+    @ManyToOne(() => Access)
+    @JoinColumn({name: "access_id"})
+    access0: Access;
 }
