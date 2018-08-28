@@ -46,6 +46,7 @@ import system from './pages/system1';
 import user from './pages/user';
 import news from './pages/news';
 import docs from './pages/docs';
+import blanks from './pages/blanks';
 import consulting from './pages/consulting';
 import bodyParser = require("body-parser");
 
@@ -64,5 +65,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 user(app);
 news(app);
-docs(app);
 consulting(app);
+docs(app);
+blanks(app);
