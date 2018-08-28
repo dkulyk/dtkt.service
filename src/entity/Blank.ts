@@ -24,7 +24,7 @@ export class Blank extends BaseEntity {
     // @Column({type: 'tinyint', width: 1, unsigned: true, default: 0})
     // assign: string;
 
-    @ManyToMany(() => User, (u: User) => u.content)
-    @JoinTable({name: 'users_blanks', joinColumn: {name: 'blank_id'}, inverseJoinColumn: {name: 'user_id'}})
-    users: User[];
+    @ManyToMany(() => User)
+    @JoinTable({name: 'user_blanks', joinColumn: {name: 'blank_id'}, inverseJoinColumn: {name: 'user_id'}})
+    clients: User[];
 }

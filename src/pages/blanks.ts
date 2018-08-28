@@ -38,7 +38,7 @@ export default function (app: Express) {
             const
                 favorite = req.body.favorite !== 'false' && !!req.body.favorite,
                 blank = await Blank.createQueryBuilder('blank')
-                    .where('blank.id = :id', {uid: req.body.id})
+                    .where('blank.id = :id', {id: req.body.id})
                     .getOne();
 
             if (!blank) {
