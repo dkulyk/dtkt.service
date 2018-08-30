@@ -28,7 +28,7 @@ export interface Session {
 
 export abstract class BaseSession {
     private _cache: { [key: string]: any } = {};
-    private _user: User | null = void 0;
+    protected _user: User | null = void 0;
     private _timer;
 
     constructor(private id?: string, private _data?: { [key: string]: any }) {
@@ -89,7 +89,7 @@ export abstract class BaseSession {
             clearTimeout(this._timer);
             this._timer = setTimeout(() => {
                 delete sessions[this.getId()];
-            }, 10 * 60 * 1000);
+            }, 39 * 1000);
         }
     }
 }
@@ -105,7 +105,7 @@ class CSession extends BaseSession implements Session {
 
 export function middleware() {
     return function (request: Request, response: Response, next: NextFunction) {
-        getSession(request).then(() => {
+        getSession(request, response).then(() => {
             next();
         }, next);
     };
@@ -134,19 +134,21 @@ async function defaultHandler(id: string): Promise<Session> {
     });
 }
 
-let handler: (id: string) => Promise<Session | null> | null = null;
+let handler: (id: string, req: Request, res: Response) => Promise<Session | null> | null = null;
 
 
-export async function getSession(request: Request): Promise<Session> {
+export async function getSession(request: Request, response: Response): Promise<Session> {
     const id = request.cookies ? request.cookies[cookie] : void 0;
     if (!id) {
-        return request['session'] = new CSession(null, {});
+        const session = await (handler || defaultHandler)(id, request, response);
+        request['session'] = session;
+        return session;
     }
     let session: Session;
     if (sessions.hasOwnProperty(id)) {
         session = sessions[id];
     } else {
-        session = await (handler || defaultHandler)(id);
+        session = await (handler || defaultHandler)(id, request, response);
     }
 
     request['session'] = session;
@@ -157,6 +159,6 @@ export async function getSession(request: Request): Promise<Session> {
 }
 
 
-export function setSessionHandler(_handler: (id: string) => Promise<Session> | null) {
+export function setSessionHandler(_handler: (id: string, req: Request, res: Response) => Promise<Session> | null) {
     handler = _handler;
 }

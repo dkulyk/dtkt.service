@@ -3,7 +3,7 @@ import {cookie, Session} from "../session";
 import {Ability} from "../entity/Shop/Ability";
 import {Mailing} from "../entity/Mailing";
 import {Item} from "../entity/Shop/Item";
-import {LessThan, MoreThan, Not} from "typeorm";
+import {getRepository, LessThan, MoreThan, Not} from "typeorm";
 
 const handler = async (req: Request, res: Response) => {
     let session: Session = req['session'],
@@ -32,7 +32,10 @@ const handler = async (req: Request, res: Response) => {
                     }, {});
 
                 const phone = await user.getPhone();
-                abilities.mailings = user.mailings.map((m: Mailing) => m.id);
+                abilities.mailings = (await getRepository(Mailing).createQueryBuilder('mailing')
+                    .innerJoin('mailing.users', 'users')
+                    .where('user_id = :id', {id: user.id})
+                    .getMany()).map((m: Mailing) => m.id);
 
                 let item = await Item.createQueryBuilder('item')
                     .innerJoin('item.user', 'user')
@@ -74,7 +77,7 @@ const handler = async (req: Request, res: Response) => {
             }
 
 
-            session.setCache('ping', ping, 300);
+            session.setCache('ping', ping, 60);
         } catch (e) {
             console.log(e);
             res.statusCode = 500;

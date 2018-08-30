@@ -14,9 +14,10 @@ import {Ability} from "./Shop/Ability";
 import {Phone} from "./Phone";
 import {Mailing} from "./Mailing";
 import {Content} from "./Content";
+import {Credential} from "./User/Credential";
 
 @Entity('users')
-export class User extends BaseEntity{
+export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -31,6 +32,10 @@ export class User extends BaseEntity{
 
     @Column()
     mname: string;
+
+    @Column({type: 'char', length: 32})
+    pass: string;
+
 
     get name(): string {
         return `${this.fname} ${this.lname}`.trim();
@@ -58,6 +63,10 @@ export class User extends BaseEntity{
     @ManyToMany(() => Content)
     @JoinTable({name: 'users_content', joinColumn: {name: 'user_id'}, inverseJoinColumn: {name: 'content_id'}})
     content: Content[];
+
+    @OneToMany(() => Credential, (c: Credential) => c.user)
+    @JoinColumn({name: "client_id"})
+    credentials: Credential[];
 
     // async abilities(): Promise<string[]> {
     //     let date = new Date;

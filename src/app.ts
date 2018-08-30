@@ -41,7 +41,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
-
+import './dksession';
 import system from './pages/system1';
 import user from './pages/user';
 import news from './pages/news';

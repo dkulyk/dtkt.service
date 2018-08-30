@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn} from "typeorm";
+import {User} from "./User";
 
 @Entity('mailing')
 export class Mailing {
@@ -20,8 +21,12 @@ export class Mailing {
     @Column({type: 'tinyint', width: 1, unsigned: true, default: 0})
     assign: string;
 
-    // //Hack
-    // @ManyToMany((a) => User, (user) => user.phones)
-    // @JoinColumn({name: "id", referencedColumnName:'mailing_id'})
-    // entity: any;
+    //Hack
+    @ManyToMany(() => User,(u:User)=>u.mailings)
+    @JoinTable({
+        name: 'mailing_users',
+        joinColumn: {name: 'mailing_id', referencedColumnName: 'id'},
+        inverseJoinColumn: {name: 'user_id', referencedColumnName: 'id'}
+    })
+    users: User[];
 }
