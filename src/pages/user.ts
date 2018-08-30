@@ -1,5 +1,5 @@
 import {Express, Request, Response} from "express";
-import {cookie, Session} from "../session";
+import {cookie, getSession, Session} from "../session";
 import {Ability} from "../entity/Shop/Ability";
 import {Mailing} from "../entity/Mailing";
 import {Item} from "../entity/Shop/Item";
@@ -97,7 +97,13 @@ const handler = async (req: Request, res: Response) => {
 
 export default function (app: Express) {
     app.get('/auth/ping', handler);
-    //temporary
-    app.get('/ru/ping', handler);
-    app.get('/ping', handler);
+    app.get('/query', async (req: Request, res: Response) => {
+        const session = await getSession(req.query.sid, req, res);
+        const user = session ? await session.user() : null;
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.end(JSON.stringify(user ? {
+            id: user.id,
+            email: user.email
+        } : null));
+    });
 }

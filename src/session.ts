@@ -105,7 +105,8 @@ class CSession extends BaseSession implements Session {
 
 export function middleware() {
     return function (request: Request, response: Response, next: NextFunction) {
-        getSession(request, response).then(() => {
+        const id = request.cookies ? request.cookies[cookie] : '';
+        getSession(id, request, response).then(() => {
             next();
         }, next);
     };
@@ -137,23 +138,23 @@ async function defaultHandler(id: string): Promise<Session> {
 let handler: (id: string, req: Request, res: Response) => Promise<Session | null> | null = null;
 
 
-export async function getSession(request: Request, response: Response): Promise<Session> {
-    const id = request.cookies ? request.cookies[cookie] : void 0;
+export async function getSession(id:string, request: Request, response: Response): Promise<Session> {
+
     if (!id) {
         const session = await (handler || defaultHandler)(id, request, response);
         request['session'] = session;
         return session;
     }
     let session: Session;
-    if (sessions.hasOwnProperty(id)) {
-        session = sessions[id];
-    } else {
+    // if (sessions.hasOwnProperty(id)) {
+    //     session = sessions[id];
+    // } else {
         session = await (handler || defaultHandler)(id, request, response);
-    }
+    // }
 
     request['session'] = session;
     session.expire();
-    sessions[id] = session;
+   // sessions[id] = session;
 
     return session;
 }
