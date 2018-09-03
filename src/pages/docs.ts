@@ -90,15 +90,16 @@ export default function (app: Express) {
             let access = 1;
             if (user) {
                 const month = date.getFullYear() * 12 + date.getMonth();
-                const ability: Ability = await (await Ability.createQueryBuilder('ability')
-                    .innerJoin('ability.type', 'type', 'type.name = :name', {name: 'documents'})
+                const ability: Ability = await Ability.createQueryBuilder('ability')
+                    .innerJoin('ability.type', 'type')
                     .where({
                         user_id: user.id,
                         active: 1,
                         begin: Not(MoreThan(month)),
                         end: Not(LessThan(month))
                     })
-                    .getOne());
+                    .andWhere('type.name = :name', {name: 'documents'})
+                    .getOne();
 
                 access = ability ? 3 : 2;
             }
