@@ -6,6 +6,11 @@ import {Item} from "../entity/Shop/Item";
 import {getRepository, LessThan, MoreThan, Not} from "typeorm";
 
 const handler = async (req: Request, res: Response) => {
+    res.cookie('dksession', '', {
+        domain: 'online.dtkt.ua',
+        path: '/',
+        expires: new Date(1)
+    });
     let session: Session = req['session'],
         ping = session.getCache('ping', void 0);
     if (ping === void 0) {
