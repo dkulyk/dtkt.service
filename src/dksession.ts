@@ -40,7 +40,14 @@ class CSession extends BaseSession implements Session {
         if (this._user !== void 0) {
             return this._user;
         }
-        this._user = this.session ? this.session.user : null;
+        this._user = null;
+
+        if (this.session) {
+            const matches = Buffer.from(this.session.payload, 'base64').toString().match(/s:50:"login_web_59ba36addc2b2f9401580f014c7f58ea4e30989d";i:(\d+);/);
+            if (matches) {
+                this._user = await getRepository(User).findOne(matches[1]);
+            }
+        }
 
         return this._user;
     }

@@ -6,7 +6,7 @@ export class Session extends BaseEntity {
     @PrimaryColumn()
     id: string;
 
-    @ManyToOne(() => User, {eager: true})
+    @ManyToOne(() => User)
     @JoinColumn({name: "user_id"})
     user: User | null;
 
