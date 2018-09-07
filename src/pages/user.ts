@@ -57,6 +57,7 @@ const handler = async (req: Request, res: Response) => {
                     id: user ? user.id : 0,
                     email: user ? user.email : '',
                     name: user ? user.name : '',
+                    nickname: user ? user.nickname : '',
                     abilities,
                     sname: cookie,
                     sid: session.getId(),
