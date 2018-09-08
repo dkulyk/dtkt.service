@@ -61,6 +61,13 @@ setSessionHandler(async (id: string, req: Request, res: Response): Promise<Sessi
         }
     }
 
+    const session = new SessionEntity();
+    session.id = makeid(40);
+    session.last_activity = Math.trunc(new Date().getTime() / 1000);
+    session.payload = Buffer.from(`a:0:{}`).toString('base64');
+    session.ip_address = req.socket.remoteAddress;
+    session.user_agent = req.header('user-agent');
+
     const a: string | void = req.cookies[remember_name];
 
     if (a) {
@@ -71,6 +78,7 @@ setSessionHandler(async (id: string, req: Request, res: Response): Promise<Sessi
                 remember_token: v[1]
             }
         });
+
         if (token) {
             const credential = await getRepository(Credential).createQueryBuilder()
                 .where({
@@ -80,22 +88,18 @@ setSessionHandler(async (id: string, req: Request, res: Response): Promise<Sessi
                 .andWhere('client_id =  :id', {id: token.user.id})
                 .getOne();
             if ((credential && credential.value === v[2]) || token.user.pass === v[2]) {
-                const session = new SessionEntity();
-                session.id = makeid(40);
-                session.user = token.user;
-                session.last_activity = Math.trunc(new Date().getTime() / 1000);
                 session.payload = Buffer.from(`a:1:{s:50:"login_web_59ba36addc2b2f9401580f014c7f58ea4e30989d";i:${token.user.id};}`).toString('base64');
-                session.ip_address = req.socket.remoteAddress;
-                session.user_agent = req.header('user-agent');
-                getRepository(SessionEntity).save(session);
-                res.cookie(cookie, session.id, {
-                    path: '/',
-                    domain: process.env.COOKIES_DOMAIN || '.dtkt.ua'
-                });
-                return new CSession(session.id, {}, session);
+                session.user = token.user;
             }
         }
     }
 
-    return new CSession();
+    getRepository(SessionEntity).save(session);
+
+    res.cookie(cookie, session.id, {
+        path: '/',
+        domain: process.env.COOKIES_DOMAIN || '.dtkt.ua',
+        secure: true
+    });
+    return new CSession(session.id, {}, session);
 });
