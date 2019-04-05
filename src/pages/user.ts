@@ -1,9 +1,10 @@
-import {Express, Request, Response} from "express";
-import {cookie, getSession, Session} from "../session";
-import {Ability} from "../entity/Shop/Ability";
-import {Mailing} from "../entity/Mailing";
-import {Item} from "../entity/Shop/Item";
-import {getRepository, LessThan, MoreThan, Not} from "typeorm";
+import { Express, Request, Response } from "express";
+import { cookie, getSession, Session } from "../session";
+import { Ability } from "../entity/Shop/Ability";
+import { Mailing } from "../entity/Mailing";
+import { Item } from "../entity/Shop/Item";
+import { getRepository, LessThan, MoreThan, Not } from "typeorm";
+import { Question } from "../entity/Question";
 
 const handler = async (req: Request, res: Response) => {
     let session: Session = req['session'],
@@ -53,6 +54,26 @@ const handler = async (req: Request, res: Response) => {
                     const dateSubscribe = new Date(Math.floor(item.end / 12), item.end % 12 + 1, 0, 0, 0, 0);
                     leftSubscribe = Math.floor((dateSubscribe.getTime() - date.getTime()) / 86400000) + 1;
                 }
+
+                await Promise.all((req.query.entity || '').split(';').map(async (entity) => {
+                    let matches = /^consult:(\d+)$/.exec(entity)
+                    if (matches) {
+                        let question = await Question.createQueryBuilder('question')
+                            .innerJoin('question.user', 'user')
+                            .innerJoin('question.consult', 'consult')
+                            .where({
+                                resoulution: 1
+                            })
+                            .andWhere('user.id = :user', {user: user.id})
+                            .andWhere('consult.id = :consult', {consult: matches[1]})
+                            .getOne();
+
+                        if(question){
+                            abilities['consult'] = true
+                        }
+                    }
+                }));
+
                 ping = {
                     id: user ? user.id : 0,
                     email: user ? user.email : '',

@@ -15,6 +15,7 @@ import {Phone} from "./Phone";
 import {Mailing} from "./Mailing";
 import {Content} from "./Content";
 import {Credential} from "./User/Credential";
+import { Question } from "./Question";
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -70,6 +71,10 @@ export class User extends BaseEntity {
     @OneToMany(() => Credential, (c: Credential) => c.user)
     @JoinColumn({name: "client_id"})
     credentials: Credential[];
+
+    @OneToMany(() => Question, (question: Question) => question.user)
+    @JoinColumn({name: "user_id"})
+    questions: Question[];
 
     // async abilities(): Promise<string[]> {
     //     let date = new Date;
