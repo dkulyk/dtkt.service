@@ -17,7 +17,7 @@
       "redis": "^2.8.0",
       "reflect-metadata": "^0.1.10",
       "tslib": "^1.9.3",
-      "typeorm": "0.2.7"
+      "typeorm": "0.3.0"
    },
    "devDependencies": {
       "@types/cookie-parser": "^1.4.1",
